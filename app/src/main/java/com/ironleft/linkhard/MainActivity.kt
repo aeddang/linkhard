@@ -1,5 +1,6 @@
 package com.ironleft.linkhard
 
+import android.content.Intent
 import android.view.View
 import com.lib.page.PageActivity
 import com.lib.page.PageFragment
@@ -21,6 +22,10 @@ class MainActivity : PageActivity<PageID>(), Rx {
 
     override fun onDestroyedView() {
 
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 

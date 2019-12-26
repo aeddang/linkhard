@@ -1,6 +1,7 @@
 package com.dagger.module.app
 
 import android.content.Context
+import com.ironleft.linkhard.store.FileUploadManager
 import com.ironleft.linkhard.store.Repository
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.ironleft.linkhard.store.SettingPreference
@@ -19,8 +20,9 @@ class RepositoryModule {
     fun provideRepository(@Named("appContext") ctx: Context,
                           setting:SettingPreference,
                           networkFactory: NetworkFactory,
-                          serverDatabaseManager: ServerDatabaseManager
+                          serverDatabaseManager: ServerDatabaseManager,
+                          fileUploadManager: FileUploadManager
 
 
-    ): Repository = Repository(ctx, setting, networkFactory, serverDatabaseManager)
+    ): Repository = Repository(ctx, setting, networkFactory, serverDatabaseManager, fileUploadManager)
 }

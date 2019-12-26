@@ -1,5 +1,6 @@
 package com.ironleft.linkhard.page.viewmodel
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import com.ironleft.linkhard.api.ApiRequest
 import com.ironleft.linkhard.model.DataList
@@ -70,6 +71,10 @@ class ViewModelDir (val repo: Repository) : ViewModel(){
 
     fun deleteList(data:DataList){
         datas = datas.filter { it.id != data.id }
+    }
+
+    fun uploadFile(file:Uri){
+        
     }
 
 

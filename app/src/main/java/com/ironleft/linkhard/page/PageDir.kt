@@ -82,8 +82,12 @@ class PageDir : RxPageFragment() {
             if(!isHealth)  CustomToast.makeToast(context!!, R.string.notice_disable_server, Toast.LENGTH_SHORT).show()
         }.apply { disposables.add(this) }
 
-        btnUpload.clicks().subscribe {
+        viewModel.repo.fileUploadManager.selectedFileObservable.subscribe {
 
+        }.apply { disposables.add(this) }
+
+        btnUpload.clicks().subscribe {
+            viewModel.repo.fileUploadManager.openFileFinder()
 
         }.apply { disposables.add(this) }
 

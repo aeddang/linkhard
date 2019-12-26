@@ -7,6 +7,7 @@
     <string name="notice_disable_server">서버상태가 정상이아닙니다. 설정페이지에서 수정이 가능합니다.</string>
     <string name="notice_not_modify">수정된 값이 없습니다.</string>
     <string name="notice_not_saved">저장하지 않은 변경사항이 있습니다 계속 하시겠습니까?</string>
+    <string name="title_file_select">업로드파일 선택.</string>
 
     <string name="btn_confirm">확인</string>
     <string name="btn_cancel">취소</string>

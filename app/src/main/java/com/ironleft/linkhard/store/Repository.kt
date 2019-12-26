@@ -7,7 +7,8 @@ class Repository(
     val ctx: Context,
     val setting:SettingPreference,
     val networkFactory: NetworkFactory,
-    val serverDatabaseManager: ServerDatabaseManager
+    val serverDatabaseManager: ServerDatabaseManager,
+    val fileUploadManager: FileUploadManager
 ) {
 
     private val appTag = "Repository"
