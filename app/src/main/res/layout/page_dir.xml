@@ -6,12 +6,12 @@
     android:orientation="vertical"
     android:background="@color/colorWhite">
 
-    <include
-        android:id="@+id/header"
-        layout="@layout/ui_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
 
+    <com.ironleft.linkhard.component.Header
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_marginLeft="@dimen/icon_regular"

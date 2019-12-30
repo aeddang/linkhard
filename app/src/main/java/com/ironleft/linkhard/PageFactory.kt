@@ -33,7 +33,7 @@ class PageFactory {
      * 히스토리 사용안함
      * 등록시 뒤로실행시 패스
      */
-    val disableHistoryPages: Array<PageID> = arrayOf(PageID.INTRO)
+    val disableHistoryPages: Array<PageID> = arrayOf(PageID.INTRO, PageID.SETUP_INIT)
 
     /**
      * 재사용가능 페이지등록
@@ -43,7 +43,6 @@ class PageFactory {
 
 
     private val fullScreenPage: Array<PageID> = arrayOf()
-
     fun isFullScreenPage(id: PageID): Boolean {
         return fullScreenPage.indexOf(id) != - 1
     }
@@ -61,6 +60,7 @@ class PageFactory {
     fun getPageByID(id: PageID): PageFragment {
         return when (id) {
             PageID.INTRO -> PageIntro()
+            PageID.SETUP_INIT -> PageSetupInit()
             PageID.DIR -> PageDir()
             PageID.SETUP_SERVER -> PageSetupServer()
 
@@ -78,7 +78,8 @@ class PageFactory {
 enum class PageID(val resId: Int, override var position: Int = 9999) : PagePosition {
     //group1
     INTRO(0,0),
+    SETUP_INIT(1000,1),
     DIR(100,100),
-    SETUP_SERVER(1000,1000),
+    SETUP_SERVER(1001,1000),
 
 }

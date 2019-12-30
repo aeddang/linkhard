@@ -2,12 +2,15 @@ package com.ironleft.linkhard
 
 import android.content.Intent
 import android.view.View
+import com.ironleft.linkhard.store.FileUploadManager
 import com.lib.page.PageActivity
 import com.lib.page.PageFragment
 import com.lib.page.PagePresenter
 import com.lib.util.CommonUtil
 import com.skeleton.rx.Rx
+import dagger.android.AndroidInjection
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : PageActivity<PageID>(), Rx {
 
@@ -16,16 +19,24 @@ class MainActivity : PageActivity<PageID>(), Rx {
     override fun getPageExitMsg(): Int = R.string.notice_app_exit
     override fun getPageAreaId(): Int = R.id.area
 
+    @Inject lateinit var fileUploadManager: FileUploadManager
+
     override fun onCreatedView() {
+        AndroidInjection.inject(this)
         PagePresenter.getInstance<PageID>().pageStart(PageID.INTRO)
+
     }
 
     override fun onDestroyedView() {
-
+        fileUploadManager.onDestroyed()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        data?.let {
+            fileUploadManager.onActivityResult(requestCode, resultCode, it)
+        }
+
     }
 
 

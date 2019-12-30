@@ -50,9 +50,7 @@ class PageIntro  : RxPageFragment() {
 
 
     private fun moveSetup(){
-        val param = HashMap<String, Any?>()
-        param[PageParam.USE_HEADER] = false
-        PagePresenter.getInstance<PageID>().pageChange(PageID.SETUP_SERVER, param)
+        PagePresenter.getInstance<PageID>().pageChange(PageID.SETUP_INIT)
     }
 
     private fun moveDir(server:ServerDatabaseManager.Row){

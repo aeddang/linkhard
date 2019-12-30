@@ -11,7 +11,6 @@ object PreferenceName{
 
 object PageParam {
 
-    const val USE_HEADER = "useHeader"
     const val SERVER_DATA = "serverData"
     const val FOLDER_DATA = "folderData"
     const val FOLDER_PATH = "folderPath"

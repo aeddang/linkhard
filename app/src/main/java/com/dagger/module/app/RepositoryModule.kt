@@ -20,9 +20,8 @@ class RepositoryModule {
     fun provideRepository(@Named("appContext") ctx: Context,
                           setting:SettingPreference,
                           networkFactory: NetworkFactory,
-                          serverDatabaseManager: ServerDatabaseManager,
-                          fileUploadManager: FileUploadManager
+                          serverDatabaseManager: ServerDatabaseManager
 
 
-    ): Repository = Repository(ctx, setting, networkFactory, serverDatabaseManager, fileUploadManager)
+    ): Repository = Repository(ctx, setting, networkFactory, serverDatabaseManager)
 }

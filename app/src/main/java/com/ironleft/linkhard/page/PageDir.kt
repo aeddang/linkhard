@@ -13,6 +13,7 @@ import com.ironleft.linkhard.R
 import com.ironleft.linkhard.model.DataList
 import com.ironleft.linkhard.model.DataType
 import com.ironleft.linkhard.page.viewmodel.ViewModelDir
+import com.ironleft.linkhard.store.FileUploadManager
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.jakewharton.rxbinding3.view.clicks
 import com.lib.page.PageFragment
@@ -28,7 +29,6 @@ import com.skeleton.view.item.VerticalLinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
 import kotlinx.android.synthetic.main.item_list.view.*
 import kotlinx.android.synthetic.main.page_dir.*
-import kotlinx.android.synthetic.main.ui_header.*
 import javax.inject.Inject
 
 
@@ -37,6 +37,9 @@ class PageDir : RxPageFragment() {
     private val appTag = javaClass.simpleName
     override fun getLayoutResId() = R.layout.page_dir
 
+
+    @Inject
+    lateinit var fileUploadManager: FileUploadManager
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: ViewModelDir
@@ -45,26 +48,28 @@ class PageDir : RxPageFragment() {
     private val adapter = ListAdapter()
     private var server:ServerDatabaseManager.Row? = null
     private var folder:DataList? = null
-    private var path:String = "root/"
+    private var path:String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModelDir::class.java)
+
     }
 
     override fun setParam(param: Map<String, Any?>): PageFragment {
         server =  param[PageParam.SERVER_DATA] as? ServerDatabaseManager.Row
         folder =  param[PageParam.FOLDER_DATA] as? DataList
-        path =  param[PageParam.FOLDER_PATH] as? String ?: path
+        path =  param[PageParam.FOLDER_PATH] as? String ?: (server?.title ?: "")
         return super.setParam(param)
     }
 
     override fun onCreatedView() {
         super.onCreatedView()
+        header.title =  path
+        header.injectFileUploadManager(fileUploadManager)
+        header.useBackButton = (folder != null)
         viewModel.server = server
-        textPageTitle.text = path
-
         context?.let {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = VerticalLinearLayoutManager(it)
@@ -82,22 +87,19 @@ class PageDir : RxPageFragment() {
             if(!isHealth)  CustomToast.makeToast(context!!, R.string.notice_disable_server, Toast.LENGTH_SHORT).show()
         }.apply { disposables.add(this) }
 
-        viewModel.repo.fileUploadManager.selectedFileObservable.subscribe {
+        fileUploadManager.uploadObservable.subscribe {
+            if(
+                it.type == FileUploadManager.EventType.Completed
+                && it.data.serverID == path
+            ){
+                viewModel.updateLists(folder?.id, path)
+            }
 
         }.apply { disposables.add(this) }
 
         btnUpload.clicks().subscribe {
-            viewModel.repo.fileUploadManager.openFileFinder()
+            fileUploadManager.openFileFinder(path)
 
-        }.apply { disposables.add(this) }
-
-        btnClose.clicks().subscribe {
-            PagePresenter.getInstance<PageID>().goBack()
-        }.apply { disposables.add(this) }
-
-        btnSetting.clicks().subscribe {
-            val param = HashMap<String, Any?>()
-            PagePresenter.getInstance<PageID>().pageChange(PageID.SETUP_SERVER, param)
         }.apply { disposables.add(this) }
 
 
@@ -150,7 +152,7 @@ class PageDir : RxPageFragment() {
                         val param = HashMap<String, Any?>()
                         param[PageParam.SERVER_DATA] = viewModel.server
                         param[PageParam.FOLDER_DATA] = data
-                        param[PageParam.FOLDER_PATH] =  "$path${data.title}/"
+                        param[PageParam.FOLDER_PATH] = "$path/${data.title}"
                         PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
                     }.apply { disposables?.add(this) }
                 }

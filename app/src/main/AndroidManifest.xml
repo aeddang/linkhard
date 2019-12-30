@@ -13,7 +13,6 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
             android:configChanges="orientation|keyboard|screenSize"
             >
             <intent-filter>
