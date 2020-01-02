@@ -13,6 +13,8 @@ import com.ironleft.linkhard.R
 import com.ironleft.linkhard.model.DataList
 import com.ironleft.linkhard.model.DataType
 import com.ironleft.linkhard.page.viewmodel.ViewModelDir
+import com.ironleft.linkhard.store.FileEventType
+import com.ironleft.linkhard.store.FileOpenController
 import com.ironleft.linkhard.store.FileUploadManager
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.jakewharton.rxbinding3.view.clicks
@@ -41,6 +43,8 @@ class PageDir : RxPageFragment() {
     @Inject
     lateinit var fileUploadManager: FileUploadManager
     @Inject
+    lateinit var fileOpenController: FileOpenController
+    @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: ViewModelDir
 
@@ -54,7 +58,6 @@ class PageDir : RxPageFragment() {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModelDir::class.java)
-
     }
 
     override fun setParam(param: Map<String, Any?>): PageFragment {
@@ -87,9 +90,9 @@ class PageDir : RxPageFragment() {
             if(!isHealth)  CustomToast.makeToast(context!!, R.string.notice_disable_server, Toast.LENGTH_SHORT).show()
         }.apply { disposables.add(this) }
 
-        fileUploadManager.uploadObservable.subscribe {
+        fileUploadManager.fileObservable.subscribe {
             if(
-                it.type == FileUploadManager.EventType.Completed
+                it.type == FileEventType.Completed
                 && it.data.serverID == path
             ){
                 viewModel.updateLists(folder?.id, path)
@@ -128,7 +131,7 @@ class PageDir : RxPageFragment() {
             field = value
 
             value?.let { data->
-                textTitle.text = data.title
+                textTitle.text = data.fileName
                 imageIcon.setImageResource(data.iconResource)
                 btnDelete.visibility = if(data.isDeleteAble) View.VISIBLE else View.GONE
                 btnLink.visibility = if(data.isLinkAble) View.VISIBLE else View.GONE
@@ -152,12 +155,15 @@ class PageDir : RxPageFragment() {
                         val param = HashMap<String, Any?>()
                         param[PageParam.SERVER_DATA] = viewModel.server
                         param[PageParam.FOLDER_DATA] = data
-                        param[PageParam.FOLDER_PATH] = "$path/${data.title}"
+                        param[PageParam.FOLDER_PATH] = "$path/${data.fileName}"
                         PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
                     }.apply { disposables?.add(this) }
                 }
 
                 btnDownload.clicks().subscribe {
+                    currentData?.let {data->
+                        fileOpenController.showDocumentFile(data.filePath, data.fileName)
+                    }
 
                 }.apply { disposables?.add(this) }
 
