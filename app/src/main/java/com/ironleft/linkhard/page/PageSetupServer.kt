@@ -13,7 +13,6 @@ import com.ironleft.linkhard.R
 import com.ironleft.linkhard.page.viewmodel.ViewModelServer
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.jakewharton.rxbinding3.view.clicks
-import com.lib.page.PageFragment
 import com.lib.page.PagePresenter
 import com.lib.view.adapter.SingleAdapter
 import com.skeleton.module.ViewModelFactory
@@ -40,7 +39,6 @@ class PageSetupServer : RxPageFragment() {
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: ViewModelServer
 
-    private var useHeader = true
     private val adapter = ListAdapter()
     private var finalServerID = -1
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,17 +47,10 @@ class PageSetupServer : RxPageFragment() {
         viewModel = ViewModelProviders.of(this, viewModelFactory).get(ViewModelServer::class.java)
     }
 
-    override fun setParam(param: Map<String, Any?>): PageFragment {
-        useHeader =  param[PageParam.USE_HEADER] as? Boolean ?: true
-        return super.setParam(param)
-
-    }
 
     override fun onCreatedView() {
         super.onCreatedView()
         finalServerID = viewModel.repo.setting.getFinalServerID()
-        header.visibility = if(useHeader) View.VISIBLE else View.GONE
-        btnSetting.visibility = View.GONE
         context?.let {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = VerticalLinearLayoutManager(it)
@@ -69,12 +60,9 @@ class PageSetupServer : RxPageFragment() {
     override fun onSubscribe() {
         super.onSubscribe()
         viewModel.serverObservable.subscribe {serverNum->
-            if(serverNum == 0 && !useHeader){
-                viewModel.addServer(ServerDatabaseManager.Row())
-            }else{
-                if(serverNum == 1 && finalServerID == -1) finalServerID = viewModel.servers[0].id
-                adapter.setDataArray(viewModel.servers.toTypedArray())
-            }
+            if(serverNum == 1 && finalServerID == -1) finalServerID = viewModel.servers[0].id
+            adapter.setDataArray(viewModel.servers.toTypedArray())
+
         }.apply { disposables.add(this) }
 
         btnAddList.clicks().subscribe {

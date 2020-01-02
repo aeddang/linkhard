@@ -12,6 +12,7 @@
         android:layout_height="match_parent">
     </FrameLayout>
 
+
     <ImageView
         android:id="@+id/dimed"
         android:layout_width="match_parent"

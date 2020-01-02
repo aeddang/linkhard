@@ -1,6 +1,7 @@
 package com.dagger.module.app
 
 import android.content.Context
+import com.ironleft.linkhard.store.FileUploadManager
 import com.ironleft.linkhard.store.Repository
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.ironleft.linkhard.store.SettingPreference

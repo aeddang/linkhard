@@ -10,7 +10,7 @@ enum class DataType{
 }
 
 
-data class DataList(val id:String, val type:DataType, val title:String){
+data class DataList(val id:String, val type:DataType, val fileName:String, val filePath:String = "/"){
 
     val isLinkAble:Boolean
         get() {

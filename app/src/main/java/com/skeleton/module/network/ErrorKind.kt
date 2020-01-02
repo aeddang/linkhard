@@ -6,9 +6,3 @@ enum class ErrorKind {
     UNEXPECTED,
     UNKNOWNHOST
 }
-
-enum class ErrorActionType {
-    Retry,
-    Finish,
-    Confirm
-}

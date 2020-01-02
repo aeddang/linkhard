@@ -25,7 +25,6 @@ open class NetworkModule {
     @Provides
     @Singleton
     fun provideNetworkFactory(application: Application): NetworkFactory {
-
         return NetworkFactory(application)
     }
 

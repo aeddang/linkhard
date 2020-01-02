@@ -1,5 +1,6 @@
 package com.ironleft.linkhard.page.viewmodel
 
+
 import androidx.lifecycle.ViewModel
 import com.ironleft.linkhard.api.ApiRequest
 import com.ironleft.linkhard.model.DataList
@@ -10,8 +11,11 @@ import com.lib.util.Log
 import io.reactivex.subjects.PublishSubject
 import java.util.*
 
+
 class ViewModelDir (val repo: Repository) : ViewModel(){
     private val appTag = javaClass.simpleName
+
+
     var server:ServerDatabaseManager.Row? = null
         set(value) {
             field = value
@@ -71,7 +75,6 @@ class ViewModelDir (val repo: Repository) : ViewModel(){
     fun deleteList(data:DataList){
         datas = datas.filter { it.id != data.id }
     }
-
 
 
     override fun onCleared() {

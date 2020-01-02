@@ -7,6 +7,7 @@ import com.dagger.module.view.PageModule
 import com.ironleft.linkhard.MainActivity
 import com.ironleft.linkhard.page.PageDir
 import com.ironleft.linkhard.page.PageIntro
+import com.ironleft.linkhard.page.PageSetupInit
 import com.ironleft.linkhard.page.PageSetupServer
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
@@ -26,6 +27,10 @@ internal abstract class AndroidBindingModule {
     @PageScope
     @ContributesAndroidInjector(modules = [PageModule::class])
     internal abstract fun bindPageIntro(): PageIntro
+
+    @PageScope
+    @ContributesAndroidInjector(modules = [PageModule::class])
+    internal abstract fun bindPageSetupInit(): PageSetupInit
 
     @PageScope
     @ContributesAndroidInjector(modules = [PageModule::class])

@@ -6,7 +6,12 @@
     <string name="notice_modify">수정합니다.</string>
     <string name="notice_disable_server">서버상태가 정상이아닙니다. 설정페이지에서 수정이 가능합니다.</string>
     <string name="notice_not_modify">수정된 값이 없습니다.</string>
+    <string name="notice_not_input">입력 값이 없습니다.</string>
     <string name="notice_not_saved">저장하지 않은 변경사항이 있습니다 계속 하시겠습니까?</string>
+    <string name="title_file_select">업로드파일 선택.</string>
+    <string name="notice_upload_init">업로드 시작.</string>
+    <string name="notice_upload_error">업로드 실패.</string>
+    <string name="notice_uploaded">업로드 완료.</string>
 
     <string name="btn_confirm">확인</string>
     <string name="btn_cancel">취소</string>
@@ -16,6 +21,7 @@
     <string name="hint_input_id">id</string>
     <string name="hint_input_pw">password</string>
 
+    <string name="page_setup_init">시작하기</string>
     <string name="page_setup_add_server">서버추가</string>
     <string name="page_setup_modify_disable">서버경로 ID PW 가 필요합니다.</string>
     <string name="page_setup_delete_disable"> 현제서버는 삭제 할 수 없습니다.</string>
