@@ -87,7 +87,7 @@ class PagePresenter<T>(var view: View<T>?, internal val model: Model<T>): Presen
         }
         return false
     }
-    override fun requestPermission( permissions: Array<out String>, requester: PageRequestPermission){
+    override fun requestPermission(permissions: Array<out String>, requester:PageRequestPermission){
         view?.requestPermission(permissions, requester)
     }
     override fun loading(isRock: Boolean): Presenter<T> {

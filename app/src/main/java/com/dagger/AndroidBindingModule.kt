@@ -5,10 +5,7 @@ import com.dagger.module.view.ActivityModule
 import com.dagger.module.view.MainActivityModule
 import com.dagger.module.view.PageModule
 import com.ironleft.linkhard.MainActivity
-import com.ironleft.linkhard.page.PageDir
-import com.ironleft.linkhard.page.PageIntro
-import com.ironleft.linkhard.page.PageSetupInit
-import com.ironleft.linkhard.page.PageSetupServer
+import com.ironleft.linkhard.page.*
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
@@ -34,9 +31,17 @@ internal abstract class AndroidBindingModule {
 
     @PageScope
     @ContributesAndroidInjector(modules = [PageModule::class])
+    internal abstract fun bindPageDir(): PageDir
+
+    @PageScope
+    @ContributesAndroidInjector(modules = [PageModule::class])
     internal abstract fun bindPageSetupServer(): PageSetupServer
 
     @PageScope
     @ContributesAndroidInjector(modules = [PageModule::class])
-    internal abstract fun bindPageDir(): PageDir
+    internal abstract fun bindPopupDownLoad(): PopupDownLoad
+
+    @PageScope
+    @ContributesAndroidInjector(modules = [PageModule::class])
+    internal abstract fun bindPopupWebView(): PopupWebView
 }

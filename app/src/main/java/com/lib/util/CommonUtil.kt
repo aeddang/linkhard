@@ -1,13 +1,12 @@
 package com.lib.util
+import android.R.attr.bitmap
 import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
-import android.database.Cursor
 import android.graphics.RectF
 import android.media.ExifInterface
 import android.net.Uri
 import android.provider.MediaStore
-import android.provider.OpenableColumns
 import android.util.Size
 import android.view.View
 import android.view.WindowManager
@@ -76,29 +75,6 @@ object CommonUtil{
 }
 
 
-fun Uri.getRealPathFromUri(context: Context): String? {
-    var path:String? = null
-    val array = arrayOf(MediaStore.Images.Media.DATA)
-    val cursor = context.contentResolver.query(this, array, null, null, null)
-    cursor?.let {
-        it.moveToFirst()
-        path = it.getString(it.getColumnIndex(array[0]))
-        cursor.close()
-    }
-    return path
-}
-
-fun Uri.getFileName(context: Context): String? {
-    var name:String? = null
-    val array = arrayOf(MediaStore.Images.Media.DATA)
-    val cursor = context.contentResolver.query(this, array, null, null, null)
-    cursor?.let {
-        it.moveToFirst()
-        name = lastPathSegment
-        cursor.close()
-    }
-    return name
-}
 
 fun Size.getCropRatioSize(crop: Size):RectF{
     val cropRatio = crop.width.toFloat()/crop.height.toFloat()

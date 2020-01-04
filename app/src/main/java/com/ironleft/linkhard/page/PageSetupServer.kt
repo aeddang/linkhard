@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProviders
 import com.ironleft.linkhard.PageID
@@ -13,6 +14,7 @@ import com.ironleft.linkhard.R
 import com.ironleft.linkhard.page.viewmodel.ViewModelServer
 import com.ironleft.linkhard.store.ServerDatabaseManager
 import com.jakewharton.rxbinding3.view.clicks
+import com.lib.module.SoftKeyboard
 import com.lib.page.PagePresenter
 import com.lib.view.adapter.SingleAdapter
 import com.skeleton.module.ViewModelFactory
@@ -23,7 +25,7 @@ import com.skeleton.view.alert.CustomToast
 import com.skeleton.view.item.ListItem
 import com.skeleton.view.item.VerticalLinearLayoutManager
 import dagger.android.support.AndroidSupportInjection
-import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.subjects.PublishSubject
 import kotlinx.android.synthetic.main.item_setup_server.view.*
 import kotlinx.android.synthetic.main.page_setup_server.*
 import kotlinx.android.synthetic.main.ui_header.*
@@ -38,8 +40,9 @@ class PageSetupServer : RxPageFragment() {
     @Inject
     lateinit var viewModelFactory: ViewModelFactory
     private lateinit var viewModel: ViewModelServer
-
+    private val items = ArrayList<Item>()
     private val adapter = ListAdapter()
+    private var keyBoard:SoftKeyboard? = null
     private var finalServerID = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,19 +53,48 @@ class PageSetupServer : RxPageFragment() {
 
     override fun onCreatedView() {
         super.onCreatedView()
+        btnCurrentDataModify.visibility = View.GONE
         finalServerID = viewModel.repo.setting.getFinalServerID()
         context?.let {
+            keyBoard = SoftKeyboard(  it.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager?)
             recyclerView.adapter = adapter
             recyclerView.layoutManager = VerticalLinearLayoutManager(it)
         }
+
+
     }
 
     override fun onSubscribe() {
         super.onSubscribe()
+        currentEditingObservable.subscribe {
+            if(it){
+                btnCurrentDataModify.visibility = View.VISIBLE
+                btnAddList.visibility = View.GONE
+            }else{
+                btnCurrentDataModify.visibility = View.GONE
+                btnAddList.visibility = View.VISIBLE
+                keyBoard?.hideKeyBoard()
+            }
+        }.apply { disposables.add(this) }
+
         viewModel.serverObservable.subscribe {serverNum->
+            currentEditingData = null
             if(serverNum == 1 && finalServerID == -1) finalServerID = viewModel.servers[0].id
             adapter.setDataArray(viewModel.servers.toTypedArray())
 
+        }.apply { disposables.add(this) }
+
+        btnCurrentDataModify.clicks().subscribe {
+            items.forEach { it.sync() }
+            currentEditingData?.let { data->
+                if(!data.isModify){
+                    CustomToast.makeToast(context!!, R.string.notice_not_modify, Toast.LENGTH_SHORT).show()
+                }else{
+                    data.sync()
+                    viewModel.updateServer(data)
+                    CustomToast.makeToast(context!!, R.string.notice_modify, Toast.LENGTH_SHORT).show()
+                }
+            }
         }.apply { disposables.add(this) }
 
         btnAddList.clicks().subscribe {
@@ -73,25 +105,44 @@ class PageSetupServer : RxPageFragment() {
             PagePresenter.getInstance<PageID>().goBack()
         }.apply { disposables.add(this) }
 
-        viewModel.syncDataBase()
 
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onTransactionCompleted() {
+        super.onTransactionCompleted()
+        viewModel.syncDataBase()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        items.clear()
+        keyBoard?.hideKeyBoard()
+        keyBoard?.destroy()
+        keyBoard = null
+        currentEditingData = null
         adapter.removeAllData()
     }
 
 
     inner class ListAdapter : SingleAdapter<ServerDatabaseManager.Row>(){
         override fun getListCell(parent: ViewGroup): ListItem {
-            return Item(context!!)
+            val item = Item(context!!)
+            items.add(item)
+            return item
         }
     }
 
+    companion object {
+        private val currentEditingObservable = PublishSubject.create<Boolean>()
+        private var currentEditingData:ServerDatabaseManager.Row? = null
+        set(value) {
+            field = value
+            currentEditingObservable.onNext(value!=null)
+        }
+    }
     inner class Item(context: Context) : ListItem(context) {
-        override fun getLayoutResId(): Int  = R.layout.item_setup_server
 
+        override fun getLayoutResId(): Int  = R.layout.item_setup_server
         private var currentData:ServerDatabaseManager.Row? = null
         private var isEditMode:Boolean = false
         set(value) {
@@ -101,6 +152,8 @@ class PageSetupServer : RxPageFragment() {
             inputID.isEnabled = value
             inputPW.isEnabled = value
             if(value){
+                if(currentEditingData !== currentData) currentEditingData?.isLock = true
+                currentEditingData = currentData
                 areaID.visibility = View.VISIBLE
                 areaPW.visibility = View.VISIBLE
                 if(currentData?.id != finalServerID) btnDelete.visibility = View.VISIBLE
@@ -108,6 +161,7 @@ class PageSetupServer : RxPageFragment() {
                 btnHome.visibility = View.GONE
                 btnModify.setImageResource(R.drawable.ic_unlock)
             }else{
+                if(currentEditingData === currentData) currentEditingData = null
                 btnDelete.visibility = View.GONE
                 btnRefresh.visibility = View.GONE
                 areaID.visibility = View.GONE
@@ -117,69 +171,75 @@ class PageSetupServer : RxPageFragment() {
             }
         }
 
-        private val isChanged:Boolean
-        get() {
-            if( currentData?.title != inputTitle.text.toString() ) return true
-            if( currentData?.path != inputServer.text.toString() ) return true
-            if( currentData?.userID != inputID.text.toString() ) return true
-            if( currentData?.userPW != inputPW.text.toString() ) return true
-            return false
-        }
 
         private fun reset(){
             currentData?.let { data ->
-                inputTitle.setText(data.title)
-                inputServer.setText(data.path)
-                inputID.setText(data.userID)
-                inputPW.setText(data.userPW)
+                inputTitle.setText(data.modifyTitle)
+                inputServer.setText(data.modifyPath)
+                inputID.setText(data.modifyUserID)
+                inputPW.setText(data.modifyUserPW)
+            }
+        }
+        internal fun sync(){
+            currentData?.let { data ->
+                data.modifyUserID = inputID.text.toString()
+                data.modifyUserPW = inputPW.text.toString()
+                data.modifyTitle = inputTitle.text.toString()
+                data.modifyPath = inputServer.text.toString()
             }
         }
 
-        override fun onAttachedToWindow() {
-            super.onAttachedToWindow()
+        override fun onCreatedView() {
+            keyBoard?.addEditTexts(arrayListOf(inputServer, inputID, inputTitle, inputPW))
             currentData?.let {data->
                 if(data.id == finalServerID) btnHome.setImageResource(R.drawable.ic_home_on)
                 else btnHome.setImageResource(R.drawable.ic_home)
                 reset()
-
                 isEditMode = !data.isLock
-                disposables = CompositeDisposable()
+                data.lockObservable.subscribe {
+                    isEditMode = !data.isLock
+                }.apply { disposables?.add(this) }
+
                 btnHome.clicks().subscribe {
                     viewModel.repo.setting.putFinalServerID(data.id)
                     val param = HashMap<String, Any?>()
                     param[PageParam.SERVER_DATA] = data
                     PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
-                }
+                }.apply { disposables?.add(this) }
 
                 btnModify.clicks().subscribe {
-                    if(isEditMode  && isChanged){
-                        CustomAlert.makeAlert(context,  R.string.notice_not_saved, object: AlertDelegate{
+                    sync()
+                    if(isEditMode  && data.isModify){
+                        CustomAlert.makeAlert(context,  R.string.page_setup_not_saved, object: AlertDelegate{
                             override fun onPositiveClicked() {
-                                isEditMode = false
                                 data.isLock = true
+                                data.reset()
                                 reset()
                             }
                         }).show()
+                    } else if(currentEditingData != null && currentEditingData !== currentData && !isEditMode ){
+                        CustomAlert.makeAlert(context,  R.string.page_setup_change_edit, object: AlertDelegate{
+                            override fun onPositiveClicked() {
+                                data.isLock = !data.isLock
+                            }
+                        }).show()
                     }else{
-                        isEditMode = !isEditMode
-                        data.isLock = !isEditMode
+                        data.isLock = !data.isLock
                     }
+                    if(!data.isLock) keyBoard?.showKeyBoard(inputTitle)
+
                 }.apply { disposables?.add(this) }
 
 
                 btnRefresh.clicks().subscribe {
-                    if(!isChanged){
+                    sync()
+                    if(!data.isModify){
                         CustomToast.makeToast(context, R.string.notice_not_modify, Toast.LENGTH_SHORT).show()
                     }else{
-                        data.userID = inputID.text.toString()
-                        data.userPW = inputPW.text.toString()
-                        data.title = inputTitle.text.toString()
-                        data.path = inputServer.text.toString()
+                        data.sync()
                         viewModel.updateServer(data)
                         CustomToast.makeToast(context, R.string.notice_modify, Toast.LENGTH_SHORT).show()
                     }
-
-
                 }.apply { disposables?.add(this) }
 
 
@@ -189,13 +249,21 @@ class PageSetupServer : RxPageFragment() {
                         return@subscribe
                     }
                     CustomAlert.makeAlert(context,  R.string.notice_delete, object: AlertDelegate{
-                        override fun onPositiveClicked() { viewModel.deleteServer(data) }
+                        override fun onPositiveClicked() {
+                            if(currentEditingData === currentData) currentEditingData = null
+                            viewModel.deleteServer(data)
+                        }
                     }).show()
                 }.apply { disposables?.add(this) }
             }
         }
 
+        override fun onDetached() {
+            keyBoard?.removeEditTexts(arrayListOf(inputServer, inputID, inputTitle, inputPW))
+            sync()
+        }
         override fun setData(data: Any?, idx:Int){
+            super.setData(data, idx)
             currentData = data as ServerDatabaseManager.Row
         }
 

@@ -2,6 +2,7 @@ package com.ironleft.linkhard
 
 import android.content.Intent
 import android.view.View
+import com.ironleft.linkhard.store.FileDownloadManager
 import com.ironleft.linkhard.store.FileUploadManager
 import com.lib.page.PageActivity
 import com.lib.page.PageFragment
@@ -20,7 +21,7 @@ class MainActivity : PageActivity<PageID>(), Rx {
     override fun getPageAreaId(): Int = R.id.area
 
     @Inject lateinit var fileUploadManager: FileUploadManager
-
+    @Inject lateinit var fileDownloadManager: FileDownloadManager
     override fun onCreatedView() {
         AndroidInjection.inject(this)
         PagePresenter.getInstance<PageID>().pageStart(PageID.INTRO)
@@ -29,6 +30,7 @@ class MainActivity : PageActivity<PageID>(), Rx {
 
     override fun onDestroyedView() {
         fileUploadManager.onDestroyed()
+        fileDownloadManager.onDestroyed()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -36,9 +38,7 @@ class MainActivity : PageActivity<PageID>(), Rx {
         data?.let {
             fileUploadManager.onActivityResult(requestCode, resultCode, it)
         }
-
     }
-
 
     override fun onWillChangePageFragment(id: PageID, param: Map<String, Any?>?, isPopup: Boolean) {
         loaded()

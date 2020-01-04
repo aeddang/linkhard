@@ -61,7 +61,7 @@ interface Presenter<T> {
     fun pageStart(id:T): Presenter<T>
     fun pageChange(id:T,param:Map<String, Any?>? = null, sharedElement:View? = null, transitionName:String? = null): Presenter<T>
     fun hasPermissions( permissions: Array<String> ): Boolean
-    fun requestPermission( permissions: Array<out String>, requester: PageRequestPermission)
+    fun requestPermission(permissions: Array<out String>, requester: PageRequestPermission)
     fun loading(isRock:Boolean = false): Presenter<T>
     fun loaded(): Presenter<T>
     fun finish()

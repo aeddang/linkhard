@@ -66,9 +66,25 @@ class ViewModelDir (val repo: Repository) : ViewModel(){
             DataList(UUID.randomUUID().toString(), DataType.Ppt, "powerpoint.ppt"),
             DataList(UUID.randomUUID().toString(), DataType.Word, "word.doc"),
             DataList(UUID.randomUUID().toString(), DataType.Excel, "excel.xlsx"),
+            DataList(UUID.randomUUID().toString(), DataType.Pdf,
+                "dummy.pdf",
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/",
+                "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf"),
             DataList(UUID.randomUUID().toString(), DataType.Music, "music.mp3"),
-            DataList(UUID.randomUUID().toString(), DataType.Movie, "movie.mp4"),
-            DataList(UUID.randomUUID().toString(), DataType.Image, "image.jpeg")
+            DataList(UUID.randomUUID().toString(), DataType.Movie,
+                "big_buck_bunny_720p_1mb.mp4",
+                "https://www.sample-videos.com/video123/mp4/720/",
+                "https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4"),
+            DataList(UUID.randomUUID().toString(), DataType.Image,
+                "Sample-jpg-image-50kb.jpg",
+                "https://sample-videos.com/img/",
+                "https://sample-videos.com/img/Sample-jpg-image-50kb.jpg"),
+
+            DataList(UUID.randomUUID().toString(), DataType.Image,
+                "Frog_on_river_4000x3000_26-09-2010_11-01am_2mb.jpg",
+                "http://upload.wikimedia.org/wikipedia/commons/c/cf/",
+                "http://upload.wikimedia.org/wikipedia/commons/c/cf/Frog_on_river_4000x3000_26-09-2010_11-01am_2mb.jpg")
+
         )
     }
 

@@ -63,7 +63,7 @@ class NetworkFactory (val app: Application){
     }
 
     fun getRetrofitDownloader( address:String  ): Retrofit {
-        val eventBus = DownloadEventBus()
+        val eventBus = ProgressEventBus()
         val downloadInterceptor = DownloadProgressInterceptor(eventBus)
         val client = getHttpClient(listOf(downloadInterceptor))
         return Retrofit.Builder()

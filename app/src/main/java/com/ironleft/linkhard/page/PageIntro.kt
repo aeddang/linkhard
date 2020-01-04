@@ -30,9 +30,13 @@ class PageIntro  : RxPageFragment() {
         super.onCreate(savedInstanceState)
         AndroidSupportInjection.inject(this)
     }
+    override fun onPause() {
+        super.onPause()
+        disposables.clear()
+    }
 
-    override fun onCreatedView() {
-        super.onCreatedView()
+    override fun onResume() {
+        super.onResume()
         Observable.interval(1500, TimeUnit.MILLISECONDS)
             .take(1)
             .observeOn(AndroidSchedulers.mainThread()).subscribe {
@@ -43,11 +47,8 @@ class PageIntro  : RxPageFragment() {
                     val data =dbManager.getData(serverID)
                     if( data == null) moveSetup() else moveDir(data)
                 }
-
             }.apply { disposables.add(this) }
-
     }
-
 
     private fun moveSetup(){
         PagePresenter.getInstance<PageID>().pageChange(PageID.SETUP_INIT)
@@ -59,8 +60,8 @@ class PageIntro  : RxPageFragment() {
         PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
     }
 
 

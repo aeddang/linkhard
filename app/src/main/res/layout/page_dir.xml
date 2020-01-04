@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:orientation="horizontal"
-        android:background="@color/colorAccent">
+        android:background="@drawable/effect_rect_bg_ripple">
         <TextView
             android:layout_marginLeft="@dimen/margin_regular"
             android:layout_width="wrap_content"

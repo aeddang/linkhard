@@ -5,6 +5,7 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import io.reactivex.subjects.PublishSubject
 
 
 class ServerDatabaseManager(ctx:Context): SQLiteOpenHelper(ctx, "Server.db", null, 1){
@@ -29,10 +30,37 @@ class ServerDatabaseManager(ctx:Context): SQLiteOpenHelper(ctx, "Server.db", nul
         var id:Int = -1
         var idx:Int = -1
         var title:String = ""
+        val lockObservable = PublishSubject.create<Boolean>()
         var isLock:Boolean = true
-        fun setupCompleted():Boolean{
-            isLock = !(path == "" || userID == "" || userPW == "")
-            return isLock
+            set(value) {
+                field = value
+                lockObservable.onNext(value)
+            }
+        val isModify:Boolean
+        get() {
+            return modifyTitle != title
+                    || modifyPath != path
+                    || modifyUserID != userID
+                    || modifyUserPW != userPW
+        }
+
+        var modifyTitle:String = ""
+        var modifyPath:String = ""
+        var modifyUserID:String = ""
+        var modifyUserPW:String = ""
+
+        fun sync(){
+            title = modifyTitle
+            path = modifyPath
+            userID = modifyUserID
+            userPW = modifyUserPW
+        }
+
+        fun reset(){
+            modifyTitle = title
+            modifyPath = path
+            modifyUserID = userID
+            modifyUserPW = userPW
         }
     }
 
@@ -69,7 +97,10 @@ class ServerDatabaseManager(ctx:Context): SQLiteOpenHelper(ctx, "Server.db", nul
         var currentData:Row? = null
         if (cursor != null) {
             cursor.moveToFirst()
-            currentData = Row(cursor.getString(2), cursor.getString(2), cursor.getString(3))
+            currentData = Row(cursor.getString(2), cursor.getString(3), cursor.getString(4))
+            currentData.id = cursor.getInt(0)
+            currentData.title = cursor.getString(1)
+            currentData.reset()
             cursor.close()
         }
         db.close()
@@ -83,11 +114,11 @@ class ServerDatabaseManager(ctx:Context): SQLiteOpenHelper(ctx, "Server.db", nul
         val cursor: Cursor? = db.query(TABLE, columns, null, null, null, null, null)
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                val currentData = Row(cursor.getString(2), cursor.getString(2), cursor.getString(3))
+                val currentData = Row(cursor.getString(2), cursor.getString(3), cursor.getString(4))
                 currentData.id = cursor.getInt(0)
                 currentData.title = cursor.getString(1)
                 currentData.idx = list.size
-                currentData.setupCompleted()
+                currentData.reset()
                 list.add( currentData )
             }
         }

@@ -8,14 +8,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_light"
+        android:layout_marginBottom="@dimen/margin_light"
         android:orientation="horizontal">
-        <ImageView
-            android:id="@+id/imageIcon"
-            android:layout_width="@dimen/icon_regular"
-            android:layout_height="@dimen/icon_regular"
-            android:src="@drawable/ic_folder"
-            android:alpha="0.5"
-            android:scaleType="fitCenter"/>
+
         <TextView
             android:id="@+id/textTitle"
             android:layout_marginLeft="@dimen/margin_regular"
@@ -26,22 +21,32 @@
             style="@style/font_regular"
              />
         <ImageButton
-            android:id="@+id/btnDownload"
+            android:id="@+id/btnCancel"
             android:layout_marginLeft="@dimen/margin_regular"
             android:layout_width="@dimen/icon_regular"
             android:layout_height="@dimen/icon_regular"
             android:tint="@color/colorPrimaryDark"
-            android:src="@drawable/ic_download"
+            android:src="@drawable/ic_pause"
             android:scaleType="fitCenter"
             android:background="@drawable/effect_circle_ripple"
             />
         <ImageButton
-            android:id="@+id/btnLink"
+            android:id="@+id/btnRetry"
             android:layout_marginLeft="@dimen/margin_regular"
             android:layout_width="@dimen/icon_regular"
             android:layout_height="@dimen/icon_regular"
             android:tint="@color/colorPrimaryDark"
-            android:src="@drawable/ic_link"
+            android:src="@drawable/ic_refresh"
+            android:scaleType="fitCenter"
+            android:background="@drawable/effect_circle_ripple"
+            />
+        <ImageButton
+            android:id="@+id/btnOpen"
+            android:layout_marginLeft="@dimen/margin_regular"
+            android:layout_width="@dimen/icon_regular"
+            android:layout_height="@dimen/icon_regular"
+            android:tint="@color/colorAccent"
+            android:src="@drawable/ic_file"
             android:scaleType="fitCenter"
             android:background="@drawable/effect_circle_ripple"
             />
@@ -57,10 +62,18 @@
             />
 
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/margin_extra_thin"
+        android:max="100"
+        android:progressDrawable="@drawable/shape_progress" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_marginTop="@dimen/margin_regular"
         android:background="@color/colorPrimaryLight"/>
 
 </LinearLayout>

@@ -20,22 +20,26 @@ abstract class ListItem: FrameLayout,  Page {
 
     @CallSuper
     override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        onCreatedView()
         onAttached()
+        super.onAttachedToWindow()
+        disposables = CompositeDisposable()
+        onCreatedView()
     }
 
     @CallSuper
     override fun onDetachedFromWindow() {
+        onDetached()
         super.onDetachedFromWindow()
         disposables?.clear()
         disposables = null
-        onDetached()
         onDestroyedView()
     }
 
     override fun onCreatedView() {}
     override fun onDestroyedView() {}
-    open fun setData(data:Any?, idx:Int = -1){}
+    open fun setData(data:Any?, idx:Int = -1){
+        disposables?.clear()
+        disposables = CompositeDisposable()
+    }
 
 }

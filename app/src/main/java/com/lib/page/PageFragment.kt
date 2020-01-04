@@ -38,6 +38,7 @@ abstract class PageFragment: Fragment(), Page,  ViewTreeObserver.OnGlobalLayoutL
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if( isInit ) {
+            view.isClickable = true
             onCreatedView()
             view.viewTreeObserver?.addOnGlobalLayoutListener ( this )
             if(isPopup) delegate?.onAddedPage(pageID)

@@ -11,7 +11,7 @@ import java.io.IOException
 
 
 @Suppress("UNCHECKED_CAST")
-open class DownloadEventBus {
+open class ProgressEventBus {
     private val mBusSubject: PublishSubject<Any> = PublishSubject.create()
     fun post(event: Any) {
         mBusSubject.onNext(event)
@@ -83,7 +83,7 @@ class DownloadProgressResponseBody(
 
 }
 
-class DownloadProgressInterceptor(val eventBus: DownloadEventBus?) : Interceptor {
+class DownloadProgressInterceptor(val eventBus: ProgressEventBus?) : Interceptor {
     @Throws(IOException::class)
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalResponse = chain.proceed(chain.request())

@@ -31,6 +31,12 @@ object CustomAlert {
         )
     }
 
+    fun makeAlert(context: Context,  message: String?, delegate: AlertDelegate): AlertDialog.Builder {
+        return makeAlert(
+            context, null , message , context.getString(R.string.btn_confirm),context.getString(R.string.btn_cancel),null, delegate
+        )
+    }
+
     fun makeAlert(context: Context,  message: Int, positiveButton:String, delegate: AlertDelegate): AlertDialog.Builder {
         return makeAlert(
             context,

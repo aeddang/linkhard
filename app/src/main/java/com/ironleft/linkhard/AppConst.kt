@@ -14,4 +14,5 @@ object PageParam {
     const val SERVER_DATA = "serverData"
     const val FOLDER_DATA = "folderData"
     const val FOLDER_PATH = "folderPath"
+    const val FILE_DATA = "fileData"
 }

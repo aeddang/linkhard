@@ -2,90 +2,138 @@ package com.ironleft.linkhard.store
 import android.content.Context
 import android.net.Uri
 import androidx.annotation.CallSuper
+import com.lib.util.Log
 import io.reactivex.disposables.Disposable
 import io.reactivex.subjects.PublishSubject
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
 enum class FileEventType{
-    Excute, Completed, Progress, Pause,Resume, Error, Cancel
+    Excute, Completed, Progress, Error, Cancel , Resume
 }
 enum class FileManagerStatus{
-    Progress, NoneProgress
+    Progress, NoneProgress, Empty
 }
 enum class FileStatus{
-    Progress, Pause, Error, Completed
+    Progress, Error, Completed, Cancel, Resume
 }
 
 data class FileEvent(val type:FileEventType, val data:FileData)
 data class FileData(val serverID:String, val fileID:String = UUID.randomUUID().toString()){
     var fileUri: Uri? = null ;internal set
     var filePath: String? = null ;internal set
-    var file:File? = null ;internal set
-    var fileStatus:FileStatus = FileStatus.Progress ;internal set
+    var fileName: String? = null ;internal set
+
     var progress:Float = 0.0f ;internal set
     var disposable: Disposable? = null ;internal set
+    var downLoadID: Long = 0L ;internal set
+
+    var fileStatus:FileStatus = FileStatus.Progress
+        internal set(value){
+            if(value != FileStatus.Progress && field == value) return
+            field = value
+            statusObservable.onNext(value)
+            if(value != FileStatus.Resume && value != FileStatus.Progress) downLoadID = 0L
+        }
+
+    val statusObservable = PublishSubject.create<FileStatus>()
 }
 
 abstract class FileManager(val context: Context){
     private val appTag = javaClass.simpleName
     val statusObservable = PublishSubject.create<FileManagerStatus>()
     val fileObservable = PublishSubject.create<FileEvent>()
+    val datasObservable = PublishSubject.create<Int>()
     val datas = ArrayList<FileData>()
-    var status:FileManagerStatus = FileManagerStatus.NoneProgress ;private set
+    var status:FileManagerStatus = FileManagerStatus.Empty ;private set
     protected var serverID:String = ""
 
     protected fun syncStatus(){
-        val willStatus = if(datas.isEmpty()) FileManagerStatus.NoneProgress else FileManagerStatus.Progress
+        val willStatus = if(datas.isEmpty()) FileManagerStatus.Empty
+        else{
+            if(datas.find { it.fileStatus == FileStatus.Progress || it.fileStatus == FileStatus.Resume } == null) FileManagerStatus.NoneProgress else FileManagerStatus.Progress
+        }
         if(willStatus != status){
             status = willStatus
             statusObservable.onNext(status)
         }
     }
 
-    @CallSuper
-    fun onDestroyed(){
-        cancelAll()
-    }
+    abstract fun onDestroyed()
 
     fun cancelAll(){
         datas.forEach { cancel(it) }
     }
+    fun resumeAll(){
+        datas.forEach { resume(it) }
+    }
 
-    fun pauseAll(){
-        datas.forEach { pause(it) }
+    fun removeAll(){
+        datas.forEach { cancel(it) }
+        datas.clear()
+        datasObservable.onNext(datas.size)
+    }
+
+    fun remove(data:FileData){
+        cancel(data)
+        datas.remove(data)
+        datasObservable.onNext(datas.size)
     }
 
     fun cancel(data:FileData){
         data.disposable?.dispose()
         data.disposable = null
-        datas.remove(data)
+        if(data.fileStatus != FileStatus.Progress) return
+        Log.d(appTag, "cancel ${data.filePath}")
+        data.fileStatus = FileStatus.Cancel
+        onCancel(data)
         fileObservable.onNext(FileEvent(FileEventType.Cancel, data))
         syncStatus()
     }
 
-    fun pause(data:FileData){
-        data.disposable?.dispose()
-        data.disposable = null
-        data.fileStatus = FileStatus.Pause
-        fileObservable.onNext(FileEvent(FileEventType.Pause, data))
-    }
-
-
     fun resume(data:FileData){
-        data.disposable?.dispose()
-        data.disposable = null
+        if(data.fileStatus == FileStatus.Completed) return
+        if(data.fileStatus == FileStatus.Resume) return
+        Log.d(appTag, "resume ${data.filePath}")
+        data.fileStatus = FileStatus.Resume
         onResume(data)
-        onExcute(data)
+        fileObservable.onNext(FileEvent(FileEventType.Resume, data))
+        syncStatus()
     }
 
     fun excute(data:FileData){
-        fileObservable.onNext(FileEvent(FileEventType.Excute, data))
+        Log.d(appTag, "excute ${data.filePath}")
         datas.add(data)
-        syncStatus()
+        data.fileStatus = FileStatus.Resume
         onExcute(data)
+        fileObservable.onNext(FileEvent(FileEventType.Excute, data))
+        syncStatus()
+        datasObservable.onNext(datas.size)
     }
-    open fun onResume(data: FileData){}
+
+    protected  fun onProgress(data: FileData){
+        data.fileStatus = FileStatus.Progress
+        fileObservable.onNext(FileEvent(FileEventType.Progress, data))
+    }
+
+    @CallSuper
+    open protected fun onError(data: FileData){
+        data.disposable?.dispose()
+        data.disposable = null
+        data.fileStatus = FileStatus.Error
+        fileObservable.onNext(FileEvent(FileEventType.Error, data))
+        syncStatus()
+    }
+    @CallSuper
+    open protected fun onComplete(data: FileData){
+        data.disposable?.dispose()
+        data.disposable = null
+        data.fileStatus = FileStatus.Completed
+        fileObservable.onNext(FileEvent(FileEventType.Completed, data))
+        syncStatus()
+    }
+
+    open protected fun onCancel(data: FileData){}
+    open protected fun onResume(data: FileData){ onExcute(data) }
     abstract fun onExcute(data: FileData)
 }

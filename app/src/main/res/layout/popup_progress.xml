@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/body"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorWhite">
-    <include
-        layout="@layout/ui_header"
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/ui_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ImageButton
+            android:id="@+id/btnDeleteAll"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/margin_regular"
+            android:layout_width="@dimen/icon_regular"
+            android:layout_height="@dimen/icon_regular"
+            android:background="@drawable/effect_circle_ripple"
+            android:src="@drawable/ic_delete"
+            android:scaleType="fitCenter"
+            android:tint="@color/colorPrimaryDark"
+            />
+
+    </FrameLayout>
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
@@ -19,8 +36,9 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         />
+
     <LinearLayout
-        android:id="@+id/btnCurrentDataModify"
+        android:id="@+id/btnOpenFolder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -32,39 +50,14 @@
             android:layout_height="wrap_content"
             android:layout_gravity="left|center_vertical"
             style="@style/font_medium"
-            android:text="@string/page_setup_currnet_server_modify"
+            android:text="@string/popup_download_open"
             android:textColor="@color/colorWhite"
             />
         <ImageView
             android:layout_margin="@dimen/margin_regular"
             android:layout_width="@dimen/icon_heavy"
             android:layout_height="@dimen/icon_heavy"
-            android:src="@drawable/ic_refresh"
-            android:tint="@color/colorWhite"
-            android:scaleType="fitCenter"
-            />
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/btnAddList"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@drawable/effect_rect_bg_ripple">
-        <TextView
-            android:layout_marginLeft="@dimen/margin_regular"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="left|center_vertical"
-            style="@style/font_medium"
-            android:text="@string/page_setup_add_server"
-            android:textColor="@color/colorWhite"
-            />
-        <ImageView
-            android:layout_margin="@dimen/margin_regular"
-            android:layout_width="@dimen/icon_heavy"
-            android:layout_height="@dimen/icon_heavy"
-            android:src="@drawable/ic_add"
+            android:src="@drawable/ic_folder_transfer"
             android:tint="@color/colorWhite"
             android:scaleType="fitCenter"
             />

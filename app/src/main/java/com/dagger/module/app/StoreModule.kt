@@ -4,6 +4,7 @@ package com.dagger.module.app
 import android.app.Activity
 import android.content.Context
 import com.dagger.ActivityScope
+import com.ironleft.linkhard.store.FileDownloadManager
 import com.ironleft.linkhard.store.FileOpenController
 import com.ironleft.linkhard.store.FileUploadManager
 import com.ironleft.linkhard.store.ServerDatabaseManager
@@ -23,6 +24,10 @@ class StoreModule {
     @Provides
     @Singleton
     fun provideFileUploadManager(@Named("appContext") ctx: Context): FileUploadManager = FileUploadManager(ctx)
+
+    @Provides
+    @Singleton
+    fun provideFileDownloadManager(@Named("appContext") ctx: Context): FileDownloadManager = FileDownloadManager(ctx)
 
     @Provides
     @Singleton

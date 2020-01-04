@@ -13,10 +13,7 @@ import com.ironleft.linkhard.R
 import com.ironleft.linkhard.model.DataList
 import com.ironleft.linkhard.model.DataType
 import com.ironleft.linkhard.page.viewmodel.ViewModelDir
-import com.ironleft.linkhard.store.FileEventType
-import com.ironleft.linkhard.store.FileOpenController
-import com.ironleft.linkhard.store.FileUploadManager
-import com.ironleft.linkhard.store.ServerDatabaseManager
+import com.ironleft.linkhard.store.*
 import com.jakewharton.rxbinding3.view.clicks
 import com.lib.page.PageFragment
 import com.lib.page.PagePresenter
@@ -42,6 +39,8 @@ class PageDir : RxPageFragment() {
 
     @Inject
     lateinit var fileUploadManager: FileUploadManager
+    @Inject
+    lateinit var fileDownloadManager: FileDownloadManager
     @Inject
     lateinit var fileOpenController: FileOpenController
     @Inject
@@ -71,6 +70,7 @@ class PageDir : RxPageFragment() {
         super.onCreatedView()
         header.title =  path
         header.injectFileUploadManager(fileUploadManager)
+        header.injectFileDownloadManager(fileDownloadManager)
         header.useBackButton = (folder != null)
         viewModel.server = server
         context?.let {
@@ -110,8 +110,8 @@ class PageDir : RxPageFragment() {
         if( folder== null ) viewModel.checkHealth()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
         adapter.removeAllData()
     }
 
@@ -161,19 +161,19 @@ class PageDir : RxPageFragment() {
                 }
 
                 btnDownload.clicks().subscribe {
-                    currentData?.let {data->
-                        fileOpenController.showDocumentFile(data.filePath, data.fileName)
-                    }
-
+                    fileDownloadManager.addDownLoad(currentData?.filePath, currentData?.fileName)
                 }.apply { disposables?.add(this) }
 
                 btnLink.clicks().subscribe {
-
+                    val param = HashMap<String, Any?>()
+                    param[PageParam.FILE_DATA] = data
+                    PagePresenter.getInstance<PageID>().openPopup(PageID.POPUP_WEBVIEW, param)
                 }.apply { disposables?.add(this) }
             }
         }
 
         override fun setData(data: Any?, idx:Int){
+            super.setData(data, idx)
             currentData = data as DataList
         }
 

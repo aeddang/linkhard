@@ -5,13 +5,22 @@
     <string name="notice_delete">삭제합니다.</string>
     <string name="notice_modify">수정합니다.</string>
     <string name="notice_disable_server">서버상태가 정상이아닙니다. 설정페이지에서 수정이 가능합니다.</string>
-    <string name="notice_not_modify">수정된 값이 없습니다.</string>
-    <string name="notice_not_input">입력 값이 없습니다.</string>
-    <string name="notice_not_saved">저장하지 않은 변경사항이 있습니다 계속 하시겠습니까?</string>
+
     <string name="title_file_select">업로드파일 선택.</string>
     <string name="notice_upload_init">업로드 시작.</string>
     <string name="notice_upload_error">업로드 실패.</string>
     <string name="notice_uploaded">업로드 완료.</string>
+    <string name="notice_download_init">다운로드 시작.</string>
+    <string name="notice_download_error">다운로드 실패.</string>
+    <string name="notice_downloaded">다운로드 완료.</string>
+    <string name="notice_not_modify">수정된 값이 없습니다.</string>
+    <string name="notice_not_input">입력 값이 없습니다.</string>
+    <string name="notice_nofile">없는 파일입니다.</string>
+    <string name="notice_disable_openfile">열 수 없는 파일입니다.</string>
+    <string name="notice_disable_sharefile"> 공유 할 수 없는 파일입니다.</string>
+    <string name="notice_stop_download">다운로드를 중지합니다.</string>
+    <string name="notice_remove_download">다운로드를 삭제합니다.\n완료된 파일은 다운로드폴더에서 확인하세요.</string>
+    <string name="notice_remove_all_download">모든 다운로드를 삭제합니다. \n진행중인 다운로드는 종료됩니다. \n이미 완료된 파일은 다운로드폴더에서 확인하세요.</string>
 
     <string name="btn_confirm">확인</string>
     <string name="btn_cancel">취소</string>
@@ -21,11 +30,18 @@
     <string name="hint_input_id">id</string>
     <string name="hint_input_pw">password</string>
 
+    <string name="page_dir_upload">파일 업로드</string>
+
     <string name="page_setup_init">시작하기</string>
     <string name="page_setup_add_server">서버추가</string>
+    <string name="page_setup_currnet_server_modify">수정완료</string>
     <string name="page_setup_modify_disable">서버경로 ID PW 가 필요합니다.</string>
     <string name="page_setup_delete_disable"> 현제서버는 삭제 할 수 없습니다.</string>
+    <string name="page_setup_not_saved">저장하지 않은 변경사항이 있습니다 계속 하시겠습니까?</string>
+    <string name="page_setup_change_edit">변경중이던 서버설정는 자동으로 취소됩니다. 계속 하시겠습니까?</string>
 
+    <string name="popup_download_open">다운로드폴더 바로가기</string>
+    <string name="popup_download_empty">다운로드중인 파일이 없습니다.</string>
+    <string name="popup_webview_share">공유하기</string>
 
-    <string name="page_dir_upload">파일 업로드</string>
 </resources>
