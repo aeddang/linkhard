@@ -6,12 +6,28 @@
     android:orientation="vertical"
     android:background="@color/colorWhite">
 
-
-    <com.ironleft.linkhard.component.Header
-        android:id="@+id/header"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        />
+        android:layout_height="wrap_content">
+        <include
+            layout="@layout/ui_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <ImageButton
+            android:id="@+id/btnDeleteAll"
+            android:layout_gravity="right|center_vertical"
+            android:layout_marginRight="@dimen/margin_regular"
+            android:layout_width="@dimen/icon_regular"
+            android:layout_height="@dimen/icon_regular"
+            android:background="@drawable/effect_circle_ripple"
+            android:src="@drawable/ic_delete"
+            android:scaleType="fitCenter"
+            android:tint="@color/colorPrimaryDark"
+            />
+
+    </FrameLayout>
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"
         android:layout_marginLeft="@dimen/icon_regular"
@@ -20,7 +36,6 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         />
-
     <LinearLayout
         android:id="@+id/btnUpload"
         android:layout_width="match_parent"
@@ -46,4 +61,5 @@
             android:scaleType="fitCenter"
             />
     </LinearLayout>
+
 </LinearLayout>

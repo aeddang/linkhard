@@ -33,7 +33,7 @@ class FileDownloadManager(ctx:Context): FileManager(ctx) {
         val fullPath = "$path$fileName"
         val uri = Uri.parse(fullPath)
         val id = fullPath.hashCode().toString()
-        val data = FileData(serverID,id)
+        val data = FileData(server?.id.toString(),id)
         data.filePath = fullPath
         data.fileUri = uri
         data.fileName = fileName

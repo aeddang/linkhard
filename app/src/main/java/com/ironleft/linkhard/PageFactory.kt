@@ -64,6 +64,7 @@ class PageFactory {
             PageID.DIR -> PageDir()
             PageID.SETUP_SERVER -> PageSetupServer()
             PageID.POPUP_DOWNLOAD -> PopupDownLoad()
+            PageID.POPUP_UPLOAD -> PopupUpLoad()
             PageID.POPUP_WEBVIEW -> PopupWebView()
         }
     }
@@ -83,6 +84,7 @@ enum class PageID(val resId: Int, override var position: Int = 9999) : PagePosit
     DIR(100,100),
     SETUP_SERVER(1001),
     POPUP_DOWNLOAD(1002),
-    POPUP_WEBVIEW(1003)
+    POPUP_UPLOAD(1003),
+    POPUP_WEBVIEW(1004)
 
 }

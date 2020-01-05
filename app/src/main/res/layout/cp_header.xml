@@ -14,7 +14,7 @@
             android:layout_height="@dimen/icon_regular"
             android:background="@drawable/effect_circle_ripple"
             android:layout_gravity="left|center_vertical"
-            android:src="@drawable/ic_out"
+            android:src="@drawable/ic_arrow_left"
             android:scaleType="fitCenter"
             android:tint="@color/colorPrimaryDark"
             />
@@ -38,7 +38,6 @@
             android:background="@drawable/effect_circle_ripple"
             android:src="@drawable/ic_upload_cloud"
             android:scaleType="fitCenter"
-            android:tint="@color/colorPrimaryDark"
             />
 
         <ImageButton
@@ -50,7 +49,6 @@
             android:background="@drawable/effect_circle_ripple"
             android:src="@drawable/ic_download_cloud"
             android:scaleType="fitCenter"
-            android:tint="@color/colorPrimaryDark"
             />
         <ImageButton
             android:id="@+id/btnSetting"

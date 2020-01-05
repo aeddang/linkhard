@@ -46,7 +46,9 @@ abstract class FileManager(val context: Context){
     val datasObservable = PublishSubject.create<Int>()
     val datas = ArrayList<FileData>()
     var status:FileManagerStatus = FileManagerStatus.Empty ;private set
-    protected var serverID:String = ""
+
+    var server:ServerDatabaseManager.Row? = null
+    var serverPath:String? = null
 
     protected fun syncStatus(){
         val willStatus = if(datas.isEmpty()) FileManagerStatus.Empty
@@ -62,25 +64,28 @@ abstract class FileManager(val context: Context){
     abstract fun onDestroyed()
 
     fun cancelAll(){
-        datas.forEach { cancel(it) }
+        datas.forEach { cancel(it, false) }
+        syncStatus()
     }
     fun resumeAll(){
         datas.forEach { resume(it) }
     }
 
     fun removeAll(){
-        datas.forEach { cancel(it) }
+        datas.forEach { cancel(it, false) }
         datas.clear()
         datasObservable.onNext(datas.size)
+        syncStatus()
     }
 
     fun remove(data:FileData){
-        cancel(data)
+        cancel(data, false)
         datas.remove(data)
         datasObservable.onNext(datas.size)
+        syncStatus()
     }
 
-    fun cancel(data:FileData){
+    fun cancel(data:FileData,isSync:Boolean = true){
         data.disposable?.dispose()
         data.disposable = null
         if(data.fileStatus != FileStatus.Progress) return
@@ -88,7 +93,7 @@ abstract class FileManager(val context: Context){
         data.fileStatus = FileStatus.Cancel
         onCancel(data)
         fileObservable.onNext(FileEvent(FileEventType.Cancel, data))
-        syncStatus()
+        if(isSync) syncStatus()
     }
 
     fun resume(data:FileData){

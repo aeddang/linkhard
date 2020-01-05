@@ -51,7 +51,11 @@ class PageDir : RxPageFragment() {
     private val adapter = ListAdapter()
     private var server:ServerDatabaseManager.Row? = null
     private var folder:DataList? = null
-    private var path:String = ""
+    private var path:String? = null
+    private val headerTitle:String
+        get() {
+            return path ?: (server?.title ?: "")
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,13 +66,15 @@ class PageDir : RxPageFragment() {
     override fun setParam(param: Map<String, Any?>): PageFragment {
         server =  param[PageParam.SERVER_DATA] as? ServerDatabaseManager.Row
         folder =  param[PageParam.FOLDER_DATA] as? DataList
-        path =  param[PageParam.FOLDER_PATH] as? String ?: (server?.title ?: "")
+        path =  param[PageParam.FOLDER_PATH] as? String?
         return super.setParam(param)
     }
 
     override fun onCreatedView() {
         super.onCreatedView()
-        header.title =  path
+        fileUploadManager.server = server
+        fileUploadManager.serverPath = path
+        header.title =  headerTitle
         header.injectFileUploadManager(fileUploadManager)
         header.injectFileDownloadManager(fileDownloadManager)
         header.useBackButton = (folder != null)
@@ -101,7 +107,7 @@ class PageDir : RxPageFragment() {
         }.apply { disposables.add(this) }
 
         btnUpload.clicks().subscribe {
-            fileUploadManager.openFileFinder(path)
+            fileUploadManager.openFileFinder()
 
         }.apply { disposables.add(this) }
 
@@ -155,7 +161,7 @@ class PageDir : RxPageFragment() {
                         val param = HashMap<String, Any?>()
                         param[PageParam.SERVER_DATA] = viewModel.server
                         param[PageParam.FOLDER_DATA] = data
-                        param[PageParam.FOLDER_PATH] = "$path/${data.fileName}"
+                        param[PageParam.FOLDER_PATH] = "$headerTitle/${data.fileName}"
                         PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
                     }.apply { disposables?.add(this) }
                 }

@@ -18,11 +18,13 @@ class FileUploadManager(ctx:Context): FileManager(ctx){
     private val appTag = javaClass.simpleName
     private val REQUEST_CODE = 10
 
+
+
+
     override fun onDestroyed() {
         cancelAll()
     }
-    fun openFileFinder(server:String, mimeType:String = "*/*", title:String = context.getString(R.string.title_file_select)) {
-        serverID = server
+    fun openFileFinder( mimeType:String = "*/*", title:String = context.getString(R.string.title_file_select)) {
         val intent: Intent = Intent()
             .setType(mimeType)
             .setAction(Intent.ACTION_GET_CONTENT)
@@ -41,7 +43,7 @@ class FileUploadManager(ctx:Context): FileManager(ctx){
         if (requestCode == REQUEST_CODE  && resultCode == Activity.RESULT_OK) {
             val selectedfile = data.data //The uri with the location of the file
             selectedfile?.let {
-                val fileData = FileData(serverID)
+                val fileData = FileData(server?.id.toString())
                 fileData.fileUri = it
                 fileData.fileName = it.lastPathSegment
                 excute(fileData)
@@ -68,7 +70,8 @@ class FileUploadManager(ctx:Context): FileManager(ctx){
                     CustomToast.makeToast(context, msg, Toast.LENGTH_SHORT).show()
                 },
                 {
-
+                    data.filePath = "https://sample-videos.com/img/Sample-jpg-image-50kb.jpg"
+                    data.fileName = "Sample-jpg-image-50kb.jpg"
                     onComplete(data)
                     val msg = "${data.fileName} ${context.getString(R.string.notice_uploaded)}"
                     CustomToast.makeToast(context, msg, Toast.LENGTH_SHORT).show()

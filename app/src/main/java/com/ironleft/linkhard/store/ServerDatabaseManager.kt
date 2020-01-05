@@ -44,6 +44,11 @@ class ServerDatabaseManager(ctx:Context): SQLiteOpenHelper(ctx, "Server.db", nul
                     || modifyUserPW != userPW
         }
 
+        val isCompleted:Boolean
+            get() {
+                return path != "" && userID != "" && userPW != ""
+            }
+
         var modifyTitle:String = ""
         var modifyPath:String = ""
         var modifyUserID:String = ""

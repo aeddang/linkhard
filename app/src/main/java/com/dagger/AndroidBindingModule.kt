@@ -43,5 +43,9 @@ internal abstract class AndroidBindingModule {
 
     @PageScope
     @ContributesAndroidInjector(modules = [PageModule::class])
+    internal abstract fun bindPopupUpLoad(): PopupUpLoad
+
+    @PageScope
+    @ContributesAndroidInjector(modules = [PageModule::class])
     internal abstract fun bindPopupWebView(): PopupWebView
 }

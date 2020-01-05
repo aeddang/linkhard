@@ -13,7 +13,7 @@
             android:layout_width="@dimen/icon_regular"
             android:layout_height="@dimen/icon_regular"
             android:background="@drawable/effect_circle_ripple"
-            android:src="@drawable/ic_out"
+            android:src="@drawable/ic_close"
             android:scaleType="fitCenter"
             android:tint="@color/colorPrimaryDark"
             />

@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import com.ironleft.linkhard.PageID
 import com.ironleft.linkhard.R
@@ -53,55 +54,49 @@ class Header : RxFrameLayout {
 
     fun injectFileUploadManager( manager: FileUploadManager) {
         fileUploadManager = manager
-        setActiveUploadStatus(fileUploadManager.status)
+        setActiveStatus(fileUploadManager.status, btnUploadStatus)
         fileUploadManager.statusObservable.subscribe {
-            setActiveUploadStatus(it)
+            setActiveStatus(it, btnUploadStatus)
         }.apply { disposables?.add(this) }
     }
 
     fun injectFileDownloadManager( manager: FileDownloadManager) {
         fileDownloadManager = manager
-        setActiveDownloadStatus(fileDownloadManager.status)
+        setActiveStatus(fileDownloadManager.status, btnDownLoadStatus)
         fileDownloadManager.statusObservable.subscribe {
-            setActiveDownloadStatus(it)
+            setActiveStatus(it,btnDownLoadStatus)
         }.apply { disposables?.add(this) }
     }
 
-    private fun setActiveUploadStatus(status:FileManagerStatus){
+    private fun setActiveStatus(status:FileManagerStatus, btn:ImageButton){
         val res = when(status){
-            FileManagerStatus.Progress -> R.drawable.ic_upload_cloud_on
-            FileManagerStatus.NoneProgress -> R.drawable.ic_upload_cloud
-            FileManagerStatus.Empty -> R.drawable.ic_upload_cloud
+            FileManagerStatus.Progress -> if(btn == btnUploadStatus) R.drawable.ic_upload_cloud_on else R.drawable.ic_download_cloud_on
+            else -> if(btn == btnUploadStatus) R.drawable.ic_upload_cloud else R.drawable.ic_download_cloud
         }
         val colorRes = when(status){
             FileManagerStatus.Progress -> R.color.colorAccent
-            FileManagerStatus.NoneProgress -> R.color.colorPrimaryDark
-            FileManagerStatus.Empty -> R.color.colorPrimaryLight
+            else -> R.color.colorPrimaryDark
         }
-        btnUploadStatus.setImageResource(res)
-        btnUploadStatus.setColorFilter(ContextCompat.getColor(context, colorRes))
+
+        val opercity = when(status){
+            FileManagerStatus.Empty -> 0.5f
+            else -> 1.0f
+        }
+        btn.alpha = opercity
+        btn.setImageResource(res)
+        btn.setColorFilter(ContextCompat.getColor(context, colorRes))
     }
 
-    private fun setActiveDownloadStatus(status:FileManagerStatus){
-        val res = when(status){
-            FileManagerStatus.Progress -> R.drawable.ic_download_cloud_on
-            FileManagerStatus.NoneProgress -> R.drawable.ic_download_cloud
-            FileManagerStatus.Empty -> R.drawable.ic_download_cloud
-        }
-        val colorRes = when(status){
-            FileManagerStatus.Progress -> R.color.colorAccent
-            FileManagerStatus.NoneProgress -> R.color.colorPrimaryDark
-            FileManagerStatus.Empty -> R.color.colorPrimaryLight
-        }
-        btnDownLoadStatus.setImageResource(res)
-        btnDownLoadStatus.setColorFilter(ContextCompat.getColor(context, colorRes))
-    }
 
 
     override fun onSubscribe() {
         super.onSubscribe()
         btnDownLoadStatus.clicks().subscribe {
             PagePresenter.getInstance<PageID>().openPopup(PageID.POPUP_DOWNLOAD)
+        }.apply { disposables?.add(this) }
+
+        btnUploadStatus.clicks().subscribe {
+            PagePresenter.getInstance<PageID>().openPopup(PageID.POPUP_UPLOAD)
         }.apply { disposables?.add(this) }
 
         btnBack.clicks().subscribe {

@@ -5,6 +5,7 @@
     <string name="notice_delete">삭제합니다.</string>
     <string name="notice_modify">수정합니다.</string>
     <string name="notice_disable_server">서버상태가 정상이아닙니다. 설정페이지에서 수정이 가능합니다.</string>
+    <string name="notice_disable_home">필수항목을 모두 입력해주세요.</string>
 
     <string name="title_file_select">업로드파일 선택.</string>
     <string name="notice_upload_init">업로드 시작.</string>
@@ -18,19 +19,27 @@
     <string name="notice_nofile">없는 파일입니다.</string>
     <string name="notice_disable_openfile">열 수 없는 파일입니다.</string>
     <string name="notice_disable_sharefile"> 공유 할 수 없는 파일입니다.</string>
+
+    <string name="notice_wait_progress">완료 되지않은 파일입니다.</string>
+
     <string name="notice_stop_download">다운로드를 중지합니다.</string>
     <string name="notice_remove_download">다운로드를 삭제합니다.\n완료된 파일은 다운로드폴더에서 확인하세요.</string>
     <string name="notice_remove_all_download">모든 다운로드를 삭제합니다. \n진행중인 다운로드는 종료됩니다. \n이미 완료된 파일은 다운로드폴더에서 확인하세요.</string>
 
+    <string name="notice_stop_upload">업로드를 중지합니다.</string>
+    <string name="notice_remove_upload">업로드를 삭제합니다.</string>
+    <string name="notice_remove_all_upload">모든 업로드를 삭제합니다. \n진행중인 업로드는 종료됩니다.</string>
+
     <string name="btn_confirm">확인</string>
     <string name="btn_cancel">취소</string>
+    <string name="btn_upload">파일 업로드</string>
 
     <string name="hint_input_server_title">서버이름(option)</string>
     <string name="hint_input_server_path">등록 할 서버경로</string>
     <string name="hint_input_id">id</string>
     <string name="hint_input_pw">password</string>
 
-    <string name="page_dir_upload">파일 업로드</string>
+
 
     <string name="page_setup_init">시작하기</string>
     <string name="page_setup_add_server">서버추가</string>
@@ -43,5 +52,8 @@
     <string name="popup_download_open">다운로드폴더 바로가기</string>
     <string name="popup_download_empty">다운로드중인 파일이 없습니다.</string>
     <string name="popup_webview_share">공유하기</string>
+
+    <string name="popup_upload_empty">업로드중인 파일이 없습니다.</string>
+
 
 </resources>

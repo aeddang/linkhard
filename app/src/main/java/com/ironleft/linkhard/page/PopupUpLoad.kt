@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.ironleft.linkhard.PageID
+import com.ironleft.linkhard.PageParam
 import com.ironleft.linkhard.R
 import com.ironleft.linkhard.model.DataList
 import com.ironleft.linkhard.store.*
@@ -24,23 +25,21 @@ import dagger.android.support.AndroidSupportInjection
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.item_progress.view.*
-import kotlinx.android.synthetic.main.popup_download.*
-import kotlinx.android.synthetic.main.popup_download.recyclerView
+import kotlinx.android.synthetic.main.popup_upload.*
+import kotlinx.android.synthetic.main.popup_upload.recyclerView
 import kotlinx.android.synthetic.main.ui_header.*
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 
-class PopupDownLoad : RxPageFragment() {
+class PopupUpLoad : RxPageFragment() {
 
     private val appTag = javaClass.simpleName
-    override fun getLayoutResId() = R.layout.popup_download
-
+    override fun getLayoutResId() = R.layout.popup_upload
 
     @Inject
-    lateinit var fileDownloadManager: FileDownloadManager
-    @Inject
-    lateinit var fileOpenController: FileOpenController
+    lateinit var fileUploadManager: FileUploadManager
+
 
     private val adapter = ListAdapter()
 
@@ -59,7 +58,7 @@ class PopupDownLoad : RxPageFragment() {
         context?.let {
             recyclerView.adapter = adapter
             recyclerView.layoutManager = VerticalLinearLayoutManager(it)
-            adapter.setDataArray(fileDownloadManager.datas.toTypedArray())
+            adapter.setDataArray(fileUploadManager.datas.toTypedArray())
         }
     }
 
@@ -71,23 +70,24 @@ class PopupDownLoad : RxPageFragment() {
 
         btnDeleteAll.clicks().subscribe {
             context ?: return@subscribe
-            if(fileDownloadManager.status == FileManagerStatus.Empty){
-                CustomToast.makeToast(context!!, R.string.popup_download_empty, Toast.LENGTH_SHORT).show()
+            if(fileUploadManager.status == FileManagerStatus.Empty){
+                CustomToast.makeToast(context!!, R.string.popup_upload_empty, Toast.LENGTH_SHORT).show()
                 return@subscribe
             }
-            CustomAlert.makeAlert(context!!,  R.string.notice_remove_all_download, object: AlertDelegate{
+            CustomAlert.makeAlert(context!!,  R.string.notice_remove_all_upload, object: AlertDelegate{
                 override fun onPositiveClicked() {
-                    fileDownloadManager.removeAll()
+                    fileUploadManager.removeAll()
                 }
             }).show()
         }.apply { disposables.add(this) }
 
-        btnOpenFolder.clicks().subscribe {
-           fileOpenController.openDownloadFolder()
+        btnUpload.clicks().subscribe {
+            fileUploadManager.openFileFinder()
+
         }.apply { disposables.add(this) }
 
-        fileDownloadManager.datasObservable.subscribe {
-            adapter.setDataArray(fileDownloadManager.datas.toTypedArray())
+        fileUploadManager.datasObservable.subscribe {
+            adapter.setDataArray(fileUploadManager.datas.toTypedArray())
 
         }.apply { disposables.add(this) }
     }
@@ -127,7 +127,7 @@ class PopupDownLoad : RxPageFragment() {
                 FileStatus.Resume -> {
                     progressBar.visibility = ViewGroup.VISIBLE
                     progressBar.progress =  (progressBar.max.toFloat() * currentData!!.progress).roundToInt()
-                    btnOpen.setImageResource(R.drawable.ic_file)
+                    btnOpen.visibility = View.GONE
                     btnRetry.visibility = View.GONE
                     btnCancel.visibility =  View.VISIBLE
                 }
@@ -135,17 +135,23 @@ class PopupDownLoad : RxPageFragment() {
                     progressBar.visibility = ViewGroup.GONE
                     btnCancel.visibility =  View.GONE
                     btnRetry.visibility = View.VISIBLE
+                    btnOpen.setImageResource(R.drawable.ic_file)
+                    btnOpen.visibility = View.VISIBLE
                 }
                 FileStatus.Error -> {
                     btnCancel.visibility =  View.GONE
                     progressBar.visibility = ViewGroup.GONE
                     btnRetry.visibility = View.VISIBLE
-                    btnOpen.setImageResource(R.drawable.ic_error)  }
+                    btnOpen.setImageResource(R.drawable.ic_error)
+                    btnOpen.visibility = View.VISIBLE
+                }
+
                 FileStatus.Completed -> {
                     btnCancel.visibility =  View.GONE
                     btnRetry.visibility = View.GONE
                     progressBar.visibility = ViewGroup.GONE
                     btnOpen.setImageResource(DataList.getIconResource(currentData!!.fileName ?: ""))
+                    btnOpen.visibility = View.VISIBLE
                 }
             }
         }
@@ -158,19 +164,19 @@ class PopupDownLoad : RxPageFragment() {
                 }.apply { disposables?.add(this) }
 
                 btnDelete.clicks().subscribe {
-                    val msg = "${data.fileName}${context.getString(R.string.notice_remove_download)}"
+                    val msg = "${data.fileName}${context.getString(R.string.notice_remove_upload)}"
                     CustomAlert.makeAlert(context,  msg, object: AlertDelegate{
                         override fun onPositiveClicked() {
-                            fileDownloadManager.remove(data)
+                            fileUploadManager.remove(data)
                         }
                     }).show()
                 }.apply { disposables?.add(this) }
 
                 btnCancel.clicks().subscribe {
-                    val msg = "${data.fileName}${context.getString(R.string.notice_stop_download)}"
+                    val msg = "${data.fileName}${context.getString(R.string.notice_stop_upload)}"
                     CustomAlert.makeAlert(context,  msg , object: AlertDelegate{
                         override fun onPositiveClicked() {
-                            fileDownloadManager.cancel(data)
+                            fileUploadManager.cancel(data)
                         }
                     }).show()
                 }.apply { disposables?.add(this) }
@@ -180,12 +186,20 @@ class PopupDownLoad : RxPageFragment() {
                         CustomToast.makeToast(context!!, R.string.notice_wait_progress, Toast.LENGTH_SHORT).show()
                         return@subscribe
                     }
-                    fileOpenController.showDocumentFile(data)
+                    if(data.filePath == null || data.filePath == ""){
+                        CustomToast.makeToast(context!!, R.string.notice_disable_openfile, Toast.LENGTH_SHORT).show()
+                        return@subscribe
+                    }
+                    val fileLink = data.filePath ?: ""
+                    val param = HashMap<String, Any?>()
+                    param[PageParam.FILE_DATA] = DataList(data.fileID, DataList.getDataType(fileLink) , data.fileName ?: "", fileLink, fileLink)
+                    PagePresenter.getInstance<PageID>().openPopup(PageID.POPUP_WEBVIEW, param)
+
                 }.apply { disposables?.add(this) }
 
                 btnRetry.clicks().subscribe {
                     if(data.fileStatus != FileStatus.Cancel && data.fileStatus != FileStatus.Error) return@subscribe
-                    fileDownloadManager.resume(data)
+                    fileUploadManager.resume(data)
                 }.apply { disposables?.add(this) }
             }
         }

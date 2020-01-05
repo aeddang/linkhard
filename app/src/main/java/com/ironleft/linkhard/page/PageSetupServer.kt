@@ -3,10 +3,12 @@ package com.ironleft.linkhard.page
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProviders
 import com.ironleft.linkhard.PageID
 import com.ironleft.linkhard.PageParam
@@ -99,6 +101,8 @@ class PageSetupServer : RxPageFragment() {
 
         btnAddList.clicks().subscribe {
             viewModel.addServer(ServerDatabaseManager.Row())
+            val handler = Handler()
+            handler.postDelayed({ recyclerView.smoothScrollToPosition(viewModel.servers.size) }, 500)
         }.apply { disposables.add(this) }
 
         btnClose.clicks().subscribe {
@@ -151,23 +155,29 @@ class PageSetupServer : RxPageFragment() {
             inputServer.isEnabled = value
             inputID.isEnabled = value
             inputPW.isEnabled = value
+            val tintColor = if(value) ContextCompat.getColor(context,R.color.colorAccent) else ContextCompat.getColor(context,R.color.colorPrimaryLight)
+            iconTitle.setColorFilter(tintColor)
+            iconServer.setColorFilter(tintColor)
+            iconID.setColorFilter(tintColor)
+            iconPW.setColorFilter(tintColor)
+
             if(value){
                 if(currentEditingData !== currentData) currentEditingData?.isLock = true
                 currentEditingData = currentData
                 areaID.visibility = View.VISIBLE
                 areaPW.visibility = View.VISIBLE
-                if(currentData?.id != finalServerID) btnDelete.visibility = View.VISIBLE
                 btnRefresh.visibility = View.VISIBLE
                 btnHome.visibility = View.GONE
                 btnModify.setImageResource(R.drawable.ic_unlock)
+                this.alpha = 1.0f
             }else{
                 if(currentEditingData === currentData) currentEditingData = null
-                btnDelete.visibility = View.GONE
                 btnRefresh.visibility = View.GONE
                 areaID.visibility = View.GONE
                 areaPW.visibility = View.GONE
                 btnHome.visibility = View.VISIBLE
                 btnModify.setImageResource(R.drawable.ic_lock)
+                this.alpha = 0.6f
             }
         }
 
@@ -189,11 +199,27 @@ class PageSetupServer : RxPageFragment() {
             }
         }
 
+        private fun setHome(data:ServerDatabaseManager.Row){
+            viewModel.repo.setting.putFinalServerID(data.id)
+            val param = HashMap<String, Any?>()
+            param[PageParam.SERVER_DATA] = data
+            PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
+        }
+
         override fun onCreatedView() {
             keyBoard?.addEditTexts(arrayListOf(inputServer, inputID, inputTitle, inputPW))
             currentData?.let {data->
-                if(data.id == finalServerID) btnHome.setImageResource(R.drawable.ic_home_on)
-                else btnHome.setImageResource(R.drawable.ic_home)
+                if(data.id == finalServerID){
+                    btnHome.setImageResource(R.drawable.ic_home_on)
+                    btnHome.setColorFilter(ContextCompat.getColor(context, R.color.colorAccent))
+                    btnDelete.visibility = View.GONE
+                }
+                else {
+                    btnHome.setImageResource(R.drawable.ic_home)
+                    btnHome.setColorFilter(ContextCompat.getColor(context, R.color.colorPrimaryDark))
+                    btnDelete.visibility = View.VISIBLE
+                }
+
                 reset()
                 isEditMode = !data.isLock
                 data.lockObservable.subscribe {
@@ -201,10 +227,20 @@ class PageSetupServer : RxPageFragment() {
                 }.apply { disposables?.add(this) }
 
                 btnHome.clicks().subscribe {
-                    viewModel.repo.setting.putFinalServerID(data.id)
-                    val param = HashMap<String, Any?>()
-                    param[PageParam.SERVER_DATA] = data
-                    PagePresenter.getInstance<PageID>().pageChange(PageID.DIR, param)
+                    if(!data.isCompleted){
+                        CustomToast.makeToast(context, R.string.notice_disable_home, Toast.LENGTH_SHORT).show()
+                        data.isLock = false
+                        return@subscribe
+                    }
+                    if(currentEditingData != null){
+                        CustomAlert.makeAlert(context,  R.string.page_setup_not_saved, object: AlertDelegate{
+                            override fun onPositiveClicked() {
+                                setHome(data)
+                            }
+                        }).show()
+                    }else{
+                        setHome(data)
+                    }
                 }.apply { disposables?.add(this) }
 
                 btnModify.clicks().subscribe {
@@ -239,6 +275,8 @@ class PageSetupServer : RxPageFragment() {
                         data.sync()
                         viewModel.updateServer(data)
                         CustomToast.makeToast(context, R.string.notice_modify, Toast.LENGTH_SHORT).show()
+                        val handler = Handler()
+                        handler.postDelayed({ recyclerView.smoothScrollToPosition(data.idx) }, 500)
                     }
                 }.apply { disposables?.add(this) }
 
